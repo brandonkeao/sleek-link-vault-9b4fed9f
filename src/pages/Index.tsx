@@ -256,7 +256,7 @@ const Index = () => {
         />
         
         <SidebarInset>
-          <div className="max-w-6xl mx-auto px-4 py-8 bg-white min-h-screen">
+          <div className="w-full px-4 py-8 bg-white min-h-screen">
             {/* Header */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
