@@ -9,7 +9,132 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      api_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          request_data: Json | null
+          request_type: string
+          response_data: Json | null
+          status_code: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          request_data?: Json | null
+          request_type: string
+          response_data?: Json | null
+          status_code?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          request_data?: Json | null
+          request_type?: string
+          response_data?: Json | null
+          status_code?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      links: {
+        Row: {
+          created_at: string
+          favicon: string | null
+          id: string
+          rebrandly_id: string | null
+          short_url: string | null
+          shortening_status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          favicon?: string | null
+          id?: string
+          rebrandly_id?: string | null
+          short_url?: string | null
+          shortening_status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          favicon?: string | null
+          id?: string
+          rebrandly_id?: string | null
+          short_url?: string | null
+          shortening_status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          auto_shorten_enabled: boolean | null
+          created_at: string
+          custom_domain: string | null
+          id: string
+          rebrandly_api_key: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_shorten_enabled?: boolean | null
+          created_at?: string
+          custom_domain?: string | null
+          id?: string
+          rebrandly_api_key?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_shorten_enabled?: boolean | null
+          created_at?: string
+          custom_domain?: string | null
+          id?: string
+          rebrandly_api_key?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

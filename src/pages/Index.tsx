@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
 import { LinkInput } from '../components/LinkInput';
 import { SearchBar } from '../components/SearchBar';
 import { ViewSwitcher } from '../components/ViewSwitcher';
@@ -9,8 +10,10 @@ import { LinkDetail } from '../components/LinkDetail';
 import { EmptyState } from '../components/EmptyState';
 import { BulkActionToolbar } from '../components/BulkActionToolbar';
 import { TagSidebar } from '../components/TagSidebar';
-import { linkStorage } from '../utils/linkStorage';
+import { SettingsPage } from '../components/SettingsPage';
+import { linkDatabase } from '../utils/linkDatabase';
 import { Link } from '../types/Link';
+import { useNavigate } from 'react-router-dom';
 import {
   SidebarProvider,
   SidebarInset,
@@ -18,6 +21,8 @@ import {
 } from '../components/ui/sidebar';
 
 const Index = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [links, setLinks] = useState<Link[]>([]);
   const [filteredLinks, setFilteredLinks] = useState<Link[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,13 +31,44 @@ const Index = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [selectedLinkIds, setSelectedLinkIds] = useState<string[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
 
-  // Load links and view preference from localStorage on mount
+  // Redirect to auth if not logged in
   useEffect(() => {
-    const savedLinks = linkStorage.getAll();
-    setLinks(savedLinks);
-    setFilteredLinks(savedLinks);
-    
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  // Load links when user is authenticated
+  useEffect(() => {
+    if (user) {
+      loadLinks();
+      
+      // Set up real-time subscription for links
+      const channel = supabase
+        .channel('links-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'links'
+          },
+          () => {
+            loadLinks();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user]);
+
+  // Load view preference from localStorage
+  useEffect(() => {
     const savedViewMode = localStorage.getItem('linkManager_viewMode') as 'card' | 'list';
     if (savedViewMode) {
       setViewMode(savedViewMode);
@@ -65,33 +101,39 @@ const Index = () => {
     }
 
     setFilteredLinks(filtered);
-    
-    // Clear selections when filters change
     setSelectedLinkIds([]);
   }, [links, searchQuery, selectedTags]);
 
-  const handleAddLink = (newLink: Link) => {
-    const updatedLinks = [newLink, ...links];
-    setLinks(updatedLinks);
-    linkStorage.save(updatedLinks);
+  const loadLinks = async () => {
+    const loadedLinks = await linkDatabase.getAll();
+    setLinks(loadedLinks);
   };
 
-  const handleUpdateLink = (updatedLink: Link) => {
-    const updatedLinks = links.map(link =>
-      link.id === updatedLink.id ? updatedLink : link
-    );
-    setLinks(updatedLinks);
-    linkStorage.save(updatedLinks);
-    setSelectedLink(updatedLink);
+  const handleAddLink = async (newLink: Omit<Link, 'id' | 'createdAt'>) => {
+    const savedLink = await linkDatabase.save(newLink);
+    if (savedLink) {
+      setLinks(prev => [savedLink, ...prev]);
+    }
   };
 
-  const handleDeleteLink = (linkId: string) => {
-    const updatedLinks = links.filter(link => link.id !== linkId);
-    setLinks(updatedLinks);
-    linkStorage.save(updatedLinks);
-    setIsDetailOpen(false);
-    setSelectedLink(null);
-    setSelectedLinkIds(prev => prev.filter(id => id !== linkId));
+  const handleUpdateLink = async (updatedLink: Link) => {
+    const success = await linkDatabase.update(updatedLink);
+    if (success) {
+      setLinks(prev => prev.map(link =>
+        link.id === updatedLink.id ? updatedLink : link
+      ));
+      setSelectedLink(updatedLink);
+    }
+  };
+
+  const handleDeleteLink = async (linkId: string) => {
+    const success = await linkDatabase.delete(linkId);
+    if (success) {
+      setLinks(prev => prev.filter(link => link.id !== linkId));
+      setIsDetailOpen(false);
+      setSelectedLink(null);
+      setSelectedLinkIds(prev => prev.filter(id => id !== linkId));
+    }
   };
 
   const handleLinkClick = (link: Link) => {
@@ -99,15 +141,28 @@ const Index = () => {
     setIsDetailOpen(true);
   };
 
-  const handleTagSelect = (tag: string | null) => {
+  const handleTagSelect = (tag: string | null, event?: React.MouseEvent) => {
     if (tag === null) {
       setSelectedTags([]);
     } else {
-      setSelectedTags(prev =>
-        prev.includes(tag)
-          ? prev.filter(t => t !== tag)
-          : [...prev, tag]
-      );
+      // Check for modifier keys for multi-selection
+      const isMultiSelect = event && (event.shiftKey || event.metaKey || event.ctrlKey);
+      
+      if (isMultiSelect) {
+        // Multi-selection: toggle the tag
+        setSelectedTags(prev =>
+          prev.includes(tag)
+            ? prev.filter(t => t !== tag)
+            : [...prev, tag]
+        );
+      } else {
+        // Single selection: replace current selection
+        if (selectedTags.length === 1 && selectedTags[0] === tag) {
+          setSelectedTags([]);
+        } else {
+          setSelectedTags([tag]);
+        }
+      }
     }
   };
 
@@ -119,16 +174,30 @@ const Index = () => {
     );
   };
 
-  const handleBulkTag = (tagsToAdd: string[]) => {
-    const updatedLinks = links.map(link => {
-      if (selectedLinkIds.includes(link.id)) {
-        const newTags = [...new Set([...link.tags, ...tagsToAdd])];
-        return { ...link, tags: newTags };
-      }
-      return link;
-    });
-    setLinks(updatedLinks);
-    linkStorage.save(updatedLinks);
+  const handleBulkTag = async (tagsToAdd: string[]) => {
+    const updatedLinks = await Promise.all(
+      selectedLinkIds.map(async (linkId) => {
+        const link = links.find(l => l.id === linkId);
+        if (link) {
+          const newTags = [...new Set([...link.tags, ...tagsToAdd])];
+          const updatedLink = { ...link, tags: newTags };
+          await linkDatabase.update(updatedLink);
+          return updatedLink;
+        }
+        return link;
+      })
+    );
+
+    setLinks(prev => prev.map(link => {
+      const updated = updatedLinks.find(u => u?.id === link.id);
+      return updated || link;
+    }));
+  };
+
+  const handleBulkShorten = () => {
+    // The bulk shortening is handled by the toolbar component
+    // This callback is used to trigger any UI updates if needed
+    loadLinks();
   };
 
   const handleSelectAll = () => {
@@ -140,9 +209,35 @@ const Index = () => {
     setSelectedLinkIds([]);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect to auth
+  }
+
+  if (showSettings) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="p-4">
+          <button
+            onClick={() => setShowSettings(false)}
+            className="mb-4 text-indigo-600 hover:text-indigo-700"
+          >
+            ← Back to Links
+          </button>
+        </div>
+        <SettingsPage />
+      </div>
+    );
+  }
+
   const allTags = [...new Set(links.flatMap(link => link.tags))];
-  
-  // Calculate tag counts
   const tagCounts = allTags.reduce((acc, tag) => {
     acc[tag] = links.filter(link => link.tags.includes(tag)).length;
     return acc;
@@ -157,6 +252,7 @@ const Index = () => {
           onTagSelect={handleTagSelect}
           linkCounts={tagCounts}
           totalLinks={links.length}
+          onSettingsClick={() => setShowSettings(true)}
         />
         
         <SidebarInset>
@@ -243,8 +339,10 @@ const Index = () => {
             {/* Bulk Action Toolbar */}
             <BulkActionToolbar
               selectedCount={selectedLinkIds.length}
+              selectedLinkIds={selectedLinkIds}
               onClearSelection={handleClearSelection}
               onBulkTag={handleBulkTag}
+              onBulkShorten={handleBulkShorten}
               allTags={allTags}
             />
 

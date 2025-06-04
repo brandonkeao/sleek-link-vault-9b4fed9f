@@ -6,4 +6,8 @@ export interface Link {
   tags: string[];
   createdAt: Date;
   favicon?: string;
+  shortUrl?: string;
+  rebrandlyId?: string;
+  shorteningStatus?: 'pending' | 'shortened' | 'error';
+  userId?: string;
 }

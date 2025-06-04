@@ -1,22 +1,32 @@
 
 import React, { useState } from 'react';
-import { Tag, X } from 'lucide-react';
+import { Tag, X, Link2 } from 'lucide-react';
 import { BulkTagDialog } from './BulkTagDialog';
+import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../integrations/supabase/client';
+import { useToast } from '../hooks/use-toast';
 
 interface BulkActionToolbarProps {
   selectedCount: number;
+  selectedLinkIds: string[];
   onClearSelection: () => void;
   onBulkTag: (tags: string[]) => void;
+  onBulkShorten: () => void;
   allTags: string[];
 }
 
 export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
   selectedCount,
+  selectedLinkIds,
   onClearSelection,
   onBulkTag,
+  onBulkShorten,
   allTags
 }) => {
   const [showTagDialog, setShowTagDialog] = useState(false);
+  const [shortening, setShortening] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   if (selectedCount === 0) return null;
 
@@ -24,6 +34,37 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
     onBulkTag(tags);
     setShowTagDialog(false);
     onClearSelection();
+  };
+
+  const handleBulkShorten = async () => {
+    if (!user) return;
+    
+    setShortening(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('bulk-shorten-links', {
+        body: { linkIds: selectedLinkIds }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Bulk shortening initiated",
+        description: `Processing ${selectedCount} links. You'll be notified when complete.`,
+      });
+
+      onBulkShorten();
+      onClearSelection();
+    } catch (error) {
+      console.error('Error bulk shortening links:', error);
+      toast({
+        title: "Error",
+        description: "Failed to initiate bulk shortening. Please try again.",
+        variant: "destructive",
+      });
+    }
+    
+    setShortening(false);
   };
 
   return (
@@ -39,6 +80,15 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
         >
           <Tag size={16} />
           Add Tags
+        </button>
+
+        <button
+          onClick={handleBulkShorten}
+          disabled={shortening}
+          className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors duration-200 disabled:opacity-50"
+        >
+          <Link2 size={16} />
+          {shortening ? 'Shortening...' : 'Shorten Links'}
         </button>
         
         <button
