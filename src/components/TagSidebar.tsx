@@ -55,26 +55,26 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">My Links</h2>
+          <h2 className="text-lg font-semibold text-gray-900">My Links</h2>
           {user && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onSettingsClick}
-              className="p-2"
+              className="p-2 text-gray-700 hover:text-gray-900"
             >
               <Settings size={16} />
             </Button>
           )}
         </div>
         {user && (
-          <div className="text-sm text-gray-600">
-            <p>{user.email}</p>
+          <div className="text-sm text-gray-700">
+            <p className="font-medium">{user.email}</p>
             <Button
               variant="link"
               size="sm"
               onClick={signOut}
-              className="p-0 h-auto text-xs"
+              className="p-0 h-auto text-xs text-purple-600 hover:text-purple-700"
             >
               Sign out
             </Button>
@@ -84,18 +84,18 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Filter by Tags</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-gray-900 font-medium">Filter by Tags</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => onTagSelect(null)}
-                  className={`w-full justify-between ${
-                    selectedTags.length === 0 ? 'bg-indigo-50 text-indigo-700' : ''
+                  className={`w-full justify-between text-gray-900 ${
+                    selectedTags.length === 0 ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
                   }`}
                 >
                   <span>All Links</span>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                  <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
                     {totalLinks}
                   </span>
                 </SidebarMenuButton>
@@ -107,12 +107,12 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
                   <SidebarMenuItem key={tag}>
                     <SidebarMenuButton
                       onClick={(e) => handleTagClick(tag, e)}
-                      className={`w-full justify-between ${
-                        isSelected ? 'bg-indigo-50 text-indigo-700' : ''
+                      className={`w-full justify-between text-gray-900 ${
+                        isSelected ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
                       }`}
                     >
                       <span className="truncate">{tag}</span>
-                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                      <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
                         {linkCounts[tag] || 0}
                       </span>
                     </SidebarMenuButton>
@@ -125,7 +125,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
         
         {selectedTags.length > 1 && (
           <SidebarGroup>
-            <SidebarGroupLabel>Active Filters</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-gray-900 font-medium">Active Filters</SidebarGroupLabel>
             <SidebarGroupContent>
               <div className="text-xs text-gray-600 px-3">
                 Hold Shift or Cmd/Ctrl to select multiple tags
