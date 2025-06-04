@@ -10,10 +10,11 @@ import { LinkDetail } from '../components/LinkDetail';
 import { EmptyState } from '../components/EmptyState';
 import { BulkActionToolbar } from '../components/BulkActionToolbar';
 import { TagSidebar } from '../components/TagSidebar';
-import { SettingsPage } from '../components/SettingsPage';
+import SettingsPage from '../components/SettingsPage';
 import { linkDatabase } from '../utils/linkDatabase';
 import { Link } from '../types/Link';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../integrations/supabase/client';
 import {
   SidebarProvider,
   SidebarInset,

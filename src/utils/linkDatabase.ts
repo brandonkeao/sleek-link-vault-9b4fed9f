@@ -23,7 +23,7 @@ export const linkDatabase = {
       favicon: link.favicon,
       shortUrl: link.short_url,
       rebrandlyId: link.rebrandly_id,
-      shorteningStatus: link.shortening_status,
+      shorteningStatus: link.shortening_status as 'pending' | 'shortened' | 'error' | undefined,
       userId: link.user_id
     }));
   },
@@ -61,7 +61,7 @@ export const linkDatabase = {
       favicon: data.favicon,
       shortUrl: data.short_url,
       rebrandlyId: data.rebrandly_id,
-      shorteningStatus: data.shortening_status,
+      shorteningStatus: data.shortening_status as 'pending' | 'shortened' | 'error' | undefined,
       userId: data.user_id
     };
   },
