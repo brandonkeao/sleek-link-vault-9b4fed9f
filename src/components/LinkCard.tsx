@@ -1,21 +1,29 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Link2 } from 'lucide-react';
 import { Link } from '../types/Link';
 import { getTimeAgo } from '../utils/timeUtils';
+import { supabase } from '../integrations/supabase/client';
+import { useToast } from '../hooks/use-toast';
 
 interface LinkCardProps {
   link: Link;
   isSelected: boolean;
   onSelect: (selected: boolean) => void;
   onClick: () => void;
+  onUpdate?: (updatedLink: Link) => void;
 }
 
 export const LinkCard: React.FC<LinkCardProps> = ({ 
   link, 
   isSelected, 
   onSelect, 
-  onClick 
+  onClick,
+  onUpdate
 }) => {
+  const [shortening, setShortening] = useState(false);
+  const { toast } = useToast();
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     onClick();
@@ -29,6 +37,48 @@ export const LinkCard: React.FC<LinkCardProps> = ({
   const handleCheckboxChange = (e: React.MouseEvent) => {
     e.stopPropagation();
     onSelect(!isSelected);
+  };
+
+  const handleShortenLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShortening(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('shorten-link', {
+        body: { linkId: link.id, url: link.url }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        const updatedLink = {
+          ...link,
+          shortUrl: data.shortUrl,
+          rebrandlyId: data.rebrandlyId,
+          shorteningStatus: 'shortened' as const
+        };
+        
+        if (onUpdate) {
+          onUpdate(updatedLink);
+        }
+
+        toast({
+          title: "Link shortened successfully",
+          description: `Short URL: ${data.shortUrl}`,
+        });
+      } else {
+        throw new Error(data.error || 'Failed to shorten link');
+      }
+    } catch (error) {
+      console.error('Error shortening link:', error);
+      toast({
+        title: "Error",
+        description: "Failed to shorten link. Please try again.",
+        variant: "destructive",
+      });
+    }
+
+    setShortening(false);
   };
 
   return (
@@ -72,6 +122,18 @@ export const LinkCard: React.FC<LinkCardProps> = ({
           >
             {link.url}
           </a>
+          {link.shortUrl && (
+            <a
+              href={link.shortUrl}
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(link.shortUrl, '_blank');
+              }}
+              className="text-sm text-green-600 hover:text-green-700 truncate block transition-colors duration-200"
+            >
+              {link.shortUrl}
+            </a>
+          )}
         </div>
       </div>
 
@@ -88,9 +150,22 @@ export const LinkCard: React.FC<LinkCardProps> = ({
         </div>
       )}
 
-      <p className="text-xs text-gray-400">
-        {getTimeAgo(link.createdAt)}
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-gray-400">
+          {getTimeAgo(link.createdAt)}
+        </p>
+        
+        {!link.shortUrl && (
+          <button
+            onClick={handleShortenLink}
+            disabled={shortening}
+            className="flex items-center gap-1 px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors duration-200 disabled:opacity-50"
+          >
+            <Link2 size={12} />
+            {shortening ? 'Shortening...' : 'Shorten'}
+          </button>
+        )}
+      </div>
     </div>
   );
 };

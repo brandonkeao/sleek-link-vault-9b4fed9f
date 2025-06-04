@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { LinkInput } from '../components/LinkInput';
@@ -317,6 +316,7 @@ const Index = () => {
                       isSelected={isSelected}
                       onSelect={(selected) => handleLinkSelection(link.id, selected)}
                       onClick={() => handleLinkClick(link)}
+                      onUpdate={handleUpdateLink}
                     />
                   ) : (
                     <LinkListItem
@@ -325,6 +325,7 @@ const Index = () => {
                       isSelected={isSelected}
                       onSelect={(selected) => handleLinkSelection(link.id, selected)}
                       onClick={() => handleLinkClick(link)}
+                      onUpdate={handleUpdateLink}
                     />
                   );
                 })}
