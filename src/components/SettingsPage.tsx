@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { settingsDatabase } from '../utils/settingsDatabase';
@@ -27,6 +26,7 @@ const SettingsPage = () => {
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiLogs, setApiLogs] = useState<ApiLog[]>([]);
   const [selectedLog, setSelectedLog] = useState<ApiLog | null>(null);
+  const [defaultTab, setDefaultTab] = useState('api-config');
 
   useEffect(() => {
     if (user) {
@@ -53,7 +53,7 @@ const SettingsPage = () => {
       .limit(50);
 
     if (!error && data) {
-      setApiLogs(data.map(log => ({
+      const logs = data.map(log => ({
         id: log.id,
         userId: log.user_id,
         requestType: log.request_type,
@@ -62,7 +62,11 @@ const SettingsPage = () => {
         statusCode: log.status_code,
         errorMessage: log.error_message,
         createdAt: new Date(log.created_at)
-      })));
+      }));
+      
+      setApiLogs(logs);
+      // Set default tab based on whether logs exist
+      setDefaultTab(logs.length > 0 ? 'api-logs' : 'api-config');
     }
   };
 
@@ -140,7 +144,7 @@ const SettingsPage = () => {
       return <Badge variant="destructive">Error</Badge>;
     }
     if (statusCode && statusCode >= 200 && statusCode < 300) {
-      return <Badge variant="default">Success</Badge>;
+      return <Badge className="bg-purple-600 text-white hover:bg-purple-700">Success</Badge>;
     }
     if (statusCode && statusCode >= 400) {
       return <Badge variant="destructive">Failed</Badge>;
@@ -151,11 +155,11 @@ const SettingsPage = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-gray-600">Manage your Rebrandly API integration and view API logs</p>
+        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+        <p className="text-gray-700">Manage your Rebrandly API integration and view API logs</p>
       </div>
 
-      <Tabs defaultValue="api-config" className="space-y-4">
+      <Tabs value={defaultTab} onValueChange={setDefaultTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="api-config">API Configuration</TabsTrigger>
           <TabsTrigger value="api-logs">API Logs</TabsTrigger>
@@ -180,6 +184,7 @@ const SettingsPage = () => {
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       placeholder="Enter your Rebrandly API key"
+                      className="text-gray-900"
                     />
                     <Button
                       type="button"
@@ -195,6 +200,7 @@ const SettingsPage = () => {
                     onClick={testApiKey} 
                     disabled={loading || !apiKey}
                     variant="outline"
+                    className="border-purple-300 text-purple-700 hover:bg-purple-50"
                   >
                     Test
                   </Button>
@@ -208,6 +214,7 @@ const SettingsPage = () => {
                   value={customDomain}
                   onChange={(e) => setCustomDomain(e.target.value)}
                   placeholder="yourdomain.com"
+                  className="text-gray-900"
                 />
               </div>
 
@@ -217,12 +224,16 @@ const SettingsPage = () => {
                   checked={autoShorten}
                   onCheckedChange={setAutoShorten}
                 />
-                <Label htmlFor="auto-shorten">
+                <Label htmlFor="auto-shorten" className="text-gray-700">
                   Automatically shorten new links
                 </Label>
               </div>
 
-              <Button onClick={handleSaveSettings} disabled={loading}>
+              <Button 
+                onClick={handleSaveSettings} 
+                disabled={loading}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+              >
                 {loading ? 'Saving...' : 'Save Settings'}
               </Button>
             </CardContent>
@@ -235,28 +246,28 @@ const SettingsPage = () => {
               <CardHeader>
                 <CardTitle>API Request Log</CardTitle>
                 <CardDescription>
-                  Recent API requests and responses
+                  Recent API requests and responses (most recent first)
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[400px]">
                   {apiLogs.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">No API logs yet</p>
+                    <p className="text-gray-600 text-center py-8">No API logs yet</p>
                   ) : (
                     <div className="space-y-2">
                       {apiLogs.map((log) => (
                         <div
                           key={log.id}
-                          className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                            selectedLog?.id === log.id ? 'border-blue-500 bg-blue-50' : ''
+                          className={`p-3 border rounded-lg cursor-pointer hover:bg-purple-50 transition-colors ${
+                            selectedLog?.id === log.id ? 'border-purple-500 bg-purple-100' : 'border-gray-200'
                           }`}
                           onClick={() => setSelectedLog(log)}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-medium">{log.requestType}</span>
+                            <span className="font-medium text-gray-900">{log.requestType}</span>
                             {getStatusBadge(log.statusCode, log.errorMessage)}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-600">
                             {log.createdAt.toLocaleString()}
                           </div>
                         </div>
@@ -278,8 +289,8 @@ const SettingsPage = () => {
                 {selectedLog ? (
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium mb-2">Request</h4>
-                      <pre className="bg-gray-100 p-3 rounded text-sm overflow-auto">
+                      <h4 className="font-medium mb-2 text-gray-900">Request</h4>
+                      <pre className="bg-gray-50 p-3 rounded text-sm overflow-auto text-gray-800">
                         {JSON.stringify(selectedLog.requestData, null, 2)}
                       </pre>
                     </div>
@@ -287,25 +298,25 @@ const SettingsPage = () => {
                     <Separator />
                     
                     <div>
-                      <h4 className="font-medium mb-2">Response</h4>
+                      <h4 className="font-medium mb-2 text-gray-900">Response</h4>
                       {selectedLog.errorMessage ? (
-                        <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
+                        <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-800">
                           {selectedLog.errorMessage}
                         </div>
                       ) : (
-                        <pre className="bg-gray-100 p-3 rounded text-sm overflow-auto">
+                        <pre className="bg-gray-50 p-3 rounded text-sm overflow-auto text-gray-800">
                           {JSON.stringify(selectedLog.responseData, null, 2)}
                         </pre>
                       )}
                     </div>
                     
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-4 text-sm text-gray-700">
                       <span>Status: {selectedLog.statusCode || 'N/A'}</span>
                       <span>Time: {selectedLog.createdAt.toLocaleString()}</span>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-8">
+                  <p className="text-gray-600 text-center py-8">
                     Select a request from the list to view details
                   </p>
                 )}
