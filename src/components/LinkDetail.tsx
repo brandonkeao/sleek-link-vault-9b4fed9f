@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash } from 'lucide-react';
+import { X, Plus, Trash, Link2, Share } from 'lucide-react';
 import { Link } from '../types/Link';
+import { supabase } from '../integrations/supabase/client';
+import { useToast } from '../hooks/use-toast';
 
 interface LinkDetailProps {
   link: Link;
@@ -23,6 +25,8 @@ export const LinkDetail: React.FC<LinkDetailProps> = ({
   const [tags, setTags] = useState<string[]>(link.tags);
   const [newTag, setNewTag] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isShortening, setIsShortening] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setTags(link.tags);
@@ -56,6 +60,64 @@ export const LinkDetail: React.FC<LinkDetailProps> = ({
     setNewTag('');
   };
 
+  const handleShortenLink = async () => {
+    setIsShortening(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('shorten-link', {
+        body: {
+          linkId: link.id,
+          url: link.url
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        const updatedLink = {
+          ...link,
+          shortUrl: data.shortUrl,
+          rebrandlyId: data.rebrandlyId,
+          shorteningStatus: 'shortened' as const
+        };
+        onUpdate(updatedLink);
+        toast({
+          title: "Link shortened successfully!",
+          description: `Short URL: ${data.shortUrl}`,
+        });
+      } else {
+        throw new Error(data.error || 'Failed to shorten link');
+      }
+    } catch (error) {
+      console.error('Error shortening link:', error);
+      toast({
+        title: "Error shortening link",
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        variant: "destructive",
+      });
+    } finally {
+      setIsShortening(false);
+    }
+  };
+
+  const handleShareLink = async () => {
+    if (link.shortUrl) {
+      try {
+        await navigator.clipboard.writeText(link.shortUrl);
+        toast({
+          title: "Link copied!",
+          description: "Short link has been copied to clipboard",
+        });
+      } catch (error) {
+        console.error('Error copying to clipboard:', error);
+        toast({
+          title: "Copy failed",
+          description: "Could not copy link to clipboard",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const suggestions = allTags.filter(tag => 
     !tags.includes(tag) && 
     tag.toLowerCase().includes(newTag.toLowerCase())
@@ -85,6 +147,20 @@ export const LinkDetail: React.FC<LinkDetailProps> = ({
             >
               {link.url}
             </a>
+            
+            {link.shortUrl && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-600 mb-1">Short URL:</p>
+                <a
+                  href={link.shortUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-600 hover:text-purple-700 text-sm break-all transition-colors duration-200"
+                >
+                  {link.shortUrl}
+                </a>
+              </div>
+            )}
           </div>
 
           <div>
@@ -158,6 +234,28 @@ export const LinkDetail: React.FC<LinkDetailProps> = ({
             >
               Open Link
             </a>
+            
+            {!link.shortUrl && (
+              <button
+                onClick={handleShortenLink}
+                disabled={isShortening}
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
+              >
+                <Link2 size={16} />
+                {isShortening ? 'Shortening...' : 'Shorten'}
+              </button>
+            )}
+            
+            {link.shortUrl && (
+              <button
+                onClick={handleShareLink}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+              >
+                <Share size={16} />
+                Share
+              </button>
+            )}
+            
             <button
               onClick={() => onDelete(link.id)}
               className="px-4 py-2 text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors duration-200"
