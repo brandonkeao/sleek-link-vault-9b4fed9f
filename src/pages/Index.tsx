@@ -256,7 +256,7 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-white">
+      <div className="min-h-screen flex w-full bg-white overflow-hidden">
         <TagSidebar
           allTags={allTags}
           selectedTags={selectedTags}
@@ -267,7 +267,7 @@ const Index = () => {
         />
         
         <SidebarInset>
-          <div className="w-full bg-white min-h-screen">
+          <div className="w-full bg-white min-h-screen overflow-y-auto" style={{ overscrollBehavior: 'none' }}>
             {/* Header */}
             <div className="mb-8 p-6 pb-0">
               <div className="flex items-center justify-between mb-4">
