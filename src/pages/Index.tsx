@@ -245,7 +245,7 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50">
+      <div className="min-h-screen flex w-full bg-white">
         <TagSidebar
           allTags={allTags}
           selectedTags={selectedTags}
@@ -256,7 +256,7 @@ const Index = () => {
         />
         
         <SidebarInset>
-          <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto px-4 py-8 bg-white min-h-screen">
             {/* Header */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
@@ -264,7 +264,7 @@ const Index = () => {
                   <SidebarTrigger />
                   <div>
                     <h1 className="text-3xl font-bold text-gray-900">My Links</h1>
-                    <p className="text-gray-600">Save and organize your favorite links</p>
+                    <p className="text-gray-700">Save and organize your favorite links</p>
                   </div>
                 </div>
                 
@@ -273,7 +273,7 @@ const Index = () => {
                     {filteredLinks.length > 0 && selectedLinkIds.length === 0 && (
                       <button
                         onClick={handleSelectAll}
-                        className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
+                        className="text-sm text-purple-600 hover:text-purple-700 transition-colors duration-200"
                       >
                         Select All
                       </button>
