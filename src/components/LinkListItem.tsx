@@ -3,14 +3,14 @@ import React from 'react';
 import { Link } from '../types/Link';
 import { getTimeAgo } from '../utils/timeUtils';
 
-interface LinkCardProps {
+interface LinkListItemProps {
   link: Link;
   isSelected: boolean;
   onSelect: (selected: boolean) => void;
   onClick: () => void;
 }
 
-export const LinkCard: React.FC<LinkCardProps> = ({ 
+export const LinkListItem: React.FC<LinkListItemProps> = ({ 
   link, 
   isSelected, 
   onSelect, 
@@ -34,13 +34,13 @@ export const LinkCard: React.FC<LinkCardProps> = ({
   return (
     <div
       onClick={handleClick}
-      className={`bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md hover:border-gray-300 transition-all duration-200 cursor-pointer group relative ${
+      className={`bg-white border border-gray-200 p-4 hover:shadow-sm hover:border-gray-300 transition-all duration-200 cursor-pointer group flex items-center gap-4 ${
         isSelected ? 'ring-2 ring-indigo-500 border-indigo-300' : ''
       }`}
     >
       <div
         onClick={handleCheckboxChange}
-        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        className="flex-shrink-0"
       >
         <input
           type="checkbox"
@@ -50,17 +50,18 @@ export const LinkCard: React.FC<LinkCardProps> = ({
         />
       </div>
 
-      <div className="flex items-start gap-3 mb-3 pr-8">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         {link.favicon && (
           <img
             src={link.favicon}
             alt=""
-            className="w-5 h-5 mt-0.5 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
         )}
+        
         <div className="flex-1 min-w-0">
           <h3 className="font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors duration-200">
             {link.title}
@@ -75,22 +76,29 @@ export const LinkCard: React.FC<LinkCardProps> = ({
         </div>
       </div>
 
-      {link.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-3">
-          {link.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <p className="text-xs text-gray-400">
-        {getTimeAgo(link.createdAt)}
-      </p>
+      <div className="flex items-center gap-4 flex-shrink-0">
+        {link.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {link.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
+              >
+                {tag}
+              </span>
+            ))}
+            {link.tags.length > 3 && (
+              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                +{link.tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+        
+        <p className="text-xs text-gray-400 whitespace-nowrap">
+          {getTimeAgo(link.createdAt)}
+        </p>
+      </div>
     </div>
   );
 };
