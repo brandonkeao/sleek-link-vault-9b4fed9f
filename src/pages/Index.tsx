@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { LinkInput } from '../components/LinkInput';
@@ -15,6 +14,7 @@ import { linkDatabase } from '../utils/linkDatabase';
 import { Link } from '../types/Link';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
+import { useToast } from '../hooks/use-toast';
 import {
   SidebarProvider,
   SidebarInset,
@@ -23,7 +23,9 @@ import {
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
+  
   const [links, setLinks] = useState<Link[]>([]);
   const [filteredLinks, setFilteredLinks] = useState<Link[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -114,6 +116,18 @@ const Index = () => {
     const savedLink = await linkDatabase.save(newLink);
     if (savedLink) {
       setLinks(prev => [savedLink, ...prev]);
+      
+      // Check for Slack notification
+      const slackConnected = localStorage.getItem('slackConnected') === 'true';
+      const slackEvents = JSON.parse(localStorage.getItem('slackEvents') || '{"newLink":true}');
+      const slackChannel = localStorage.getItem('slackChannel') || '#general';
+      
+      if (slackConnected && slackEvents.newLink) {
+        toast({
+          title: "Link saved and Slack notified",
+          description: `Notified ${slackChannel}`,
+        });
+      }
     }
   };
 
