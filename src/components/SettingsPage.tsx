@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { settingsDatabase } from '../utils/settingsDatabase';
@@ -154,29 +153,29 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6 bg-white min-h-screen">
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600">Manage your Rebrandly API integration and view API logs</p>
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <p className="text-muted-foreground">Manage your Rebrandly API integration and view API logs</p>
       </div>
 
       <Tabs value={defaultTab} onValueChange={setDefaultTab} className="space-y-4">
-        <TabsList className="bg-gray-100">
-          <TabsTrigger value="api-config" className="data-[state=active]:bg-white">API Configuration</TabsTrigger>
-          <TabsTrigger value="api-logs" className="data-[state=active]:bg-white">API Logs</TabsTrigger>
+        <TabsList>
+          <TabsTrigger value="api-config">API Configuration</TabsTrigger>
+          <TabsTrigger value="api-logs">API Logs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="api-config">
-          <Card className="border-gray-200 shadow-sm">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-gray-900">Rebrandly API Configuration</CardTitle>
-              <CardDescription className="text-gray-600">
+              <CardTitle>Rebrandly API Configuration</CardTitle>
+              <CardDescription>
                 Configure your Rebrandly API key and settings to enable link shortening
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="api-key" className="text-gray-700">API Key</Label>
+                <Label htmlFor="api-key">API Key</Label>
                 <div className="flex space-x-2">
                   <div className="relative flex-1">
                     <Input
@@ -185,13 +184,12 @@ const SettingsPage = () => {
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       placeholder="Enter your Rebrandly API key"
-                      className="border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-0 top-0 h-full px-3 text-gray-500 hover:text-gray-700"
+                      className="absolute right-0 top-0 h-full px-3"
                       onClick={() => setShowApiKey(!showApiKey)}
                     >
                       {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -201,7 +199,6 @@ const SettingsPage = () => {
                     onClick={testApiKey} 
                     disabled={loading || !apiKey}
                     variant="outline"
-                    className="border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
                     Test
                   </Button>
@@ -209,13 +206,12 @@ const SettingsPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="custom-domain" className="text-gray-700">Custom Domain (Optional)</Label>
+                <Label htmlFor="custom-domain">Custom Domain (Optional)</Label>
                 <Input
                   id="custom-domain"
                   value={customDomain}
                   onChange={(e) => setCustomDomain(e.target.value)}
                   placeholder="yourdomain.com"
-                  className="border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
                 />
               </div>
 
@@ -225,7 +221,7 @@ const SettingsPage = () => {
                   checked={autoShorten}
                   onCheckedChange={setAutoShorten}
                 />
-                <Label htmlFor="auto-shorten" className="text-gray-700">
+                <Label htmlFor="auto-shorten">
                   Automatically shorten new links
                 </Label>
               </div>
@@ -233,7 +229,6 @@ const SettingsPage = () => {
               <Button 
                 onClick={handleSaveSettings} 
                 disabled={loading}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
               >
                 {loading ? 'Saving...' : 'Save Settings'}
               </Button>
@@ -243,32 +238,32 @@ const SettingsPage = () => {
 
         <TabsContent value="api-logs">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border-gray-200 shadow-sm">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-gray-900">API Request Log</CardTitle>
-                <CardDescription className="text-gray-600">
+                <CardTitle>API Request Log</CardTitle>
+                <CardDescription>
                   Recent API requests and responses (most recent first)
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[400px]">
                   {apiLogs.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">No API logs yet</p>
+                    <p className="text-muted-foreground text-center py-8">No API logs yet</p>
                   ) : (
                     <div className="space-y-2">
                       {apiLogs.map((log) => (
                         <div
                           key={log.id}
-                          className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                            selectedLog?.id === log.id ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'
+                          className={`p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${
+                            selectedLog?.id === log.id ? 'border-primary bg-muted' : ''
                           }`}
                           onClick={() => setSelectedLog(log)}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-900">{log.requestType}</span>
+                            <span className="font-medium">{log.requestType}</span>
                             {getStatusBadge(log.statusCode, log.errorMessage)}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-muted-foreground">
                             {log.createdAt.toLocaleString()}
                           </div>
                         </div>
@@ -279,10 +274,10 @@ const SettingsPage = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200 shadow-sm">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-gray-900">Request Details</CardTitle>
-                <CardDescription className="text-gray-600">
+                <CardTitle>Request Details</CardTitle>
+                <CardDescription>
                   {selectedLog ? 'Detailed view of the selected request' : 'Select a request to view details'}
                 </CardDescription>
               </CardHeader>
@@ -290,8 +285,8 @@ const SettingsPage = () => {
                 {selectedLog ? (
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium mb-2 text-gray-900">Request</h4>
-                      <pre className="bg-gray-50 p-3 rounded text-sm overflow-auto text-gray-800 border border-gray-200">
+                      <h4 className="font-medium mb-2">Request</h4>
+                      <pre className="bg-muted p-3 rounded text-sm overflow-auto">
                         {JSON.stringify(selectedLog.requestData, null, 2)}
                       </pre>
                     </div>
@@ -299,25 +294,25 @@ const SettingsPage = () => {
                     <Separator />
                     
                     <div>
-                      <h4 className="font-medium mb-2 text-gray-900">Response</h4>
+                      <h4 className="font-medium mb-2">Response</h4>
                       {selectedLog.errorMessage ? (
-                        <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-800">
+                        <div className="bg-destructive/10 border border-destructive/20 p-3 rounded text-sm text-destructive">
                           {selectedLog.errorMessage}
                         </div>
                       ) : (
-                        <pre className="bg-gray-50 p-3 rounded text-sm overflow-auto text-gray-800 border border-gray-200">
+                        <pre className="bg-muted p-3 rounded text-sm overflow-auto">
                           {JSON.stringify(selectedLog.responseData, null, 2)}
                         </pre>
                       )}
                     </div>
                     
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                       <span>Status: {selectedLog.statusCode || 'N/A'}</span>
                       <span>Time: {selectedLog.createdAt.toLocaleString()}</span>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-8">
+                  <p className="text-muted-foreground text-center py-8">
                     Select a request from the list to view details
                   </p>
                 )}
