@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { LinkInput } from '../components/LinkInput';
@@ -221,6 +222,13 @@ const Index = () => {
     return null; // Will redirect to auth
   }
 
+  // Calculate allTags and tagCounts - moved before the settings page render
+  const allTags = [...new Set(links.flatMap(link => link.tags))];
+  const tagCounts = allTags.reduce((acc, tag) => {
+    acc[tag] = links.filter(link => link.tags.includes(tag)).length;
+    return acc;
+  }, {} as Record<string, number>);
+
   if (showSettings) {
     return (
       <SettingsPage 
@@ -231,12 +239,6 @@ const Index = () => {
       />
     );
   }
-
-  const allTags = [...new Set(links.flatMap(link => link.tags))];
-  const tagCounts = allTags.reduce((acc, tag) => {
-    acc[tag] = links.filter(link => link.tags.includes(tag)).length;
-    return acc;
-  }, {} as Record<string, number>);
 
   return (
     <SidebarProvider>
