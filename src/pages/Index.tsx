@@ -256,7 +256,7 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-white overflow-hidden">
+      <div className="min-h-screen flex w-full bg-white">
         <TagSidebar
           allTags={allTags}
           selectedTags={selectedTags}
@@ -267,9 +267,9 @@ const Index = () => {
         />
         
         <SidebarInset>
-          <div className="w-full bg-white min-h-screen overflow-y-auto" style={{ overscrollBehavior: 'none' }}>
+          <div className="w-full px-4 py-8 bg-white min-h-screen">
             {/* Header */}
-            <div className="mb-8 p-6 pb-0">
+            <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <SidebarTrigger />
@@ -296,13 +296,13 @@ const Index = () => {
             </div>
 
             {/* Add Link Input */}
-            <div className="mb-6 px-6">
+            <div className="mb-6">
               <LinkInput onAddLink={handleAddLink} />
             </div>
 
             {/* Search */}
             {links.length > 0 && (
-              <div className="mb-6 px-6">
+              <div className="mb-6">
                 <SearchBar 
                   searchQuery={searchQuery}
                   onSearchChange={setSearchQuery}
@@ -311,45 +311,43 @@ const Index = () => {
             )}
 
             {/* Links Display */}
-            <div className="px-6">
-              {filteredLinks.length > 0 ? (
-                <div className={
-                  viewMode === 'card' 
-                    ? "grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-                    : "space-y-2"
-                }>
-                  {filteredLinks.map((link) => {
-                    const isSelected = selectedLinkIds.includes(link.id);
-                    
-                    return viewMode === 'card' ? (
-                      <LinkCard
-                        key={link.id}
-                        link={link}
-                        isSelected={isSelected}
-                        onSelect={(selected) => handleLinkSelection(link.id, selected)}
-                        onClick={() => handleLinkClick(link)}
-                        onUpdate={handleUpdateLink}
-                      />
-                    ) : (
-                      <LinkListItem
-                        key={link.id}
-                        link={link}
-                        isSelected={isSelected}
-                        onSelect={(selected) => handleLinkSelection(link.id, selected)}
-                        onClick={() => handleLinkClick(link)}
-                        onUpdate={handleUpdateLink}
-                      />
-                    );
-                  })}
-                </div>
-              ) : links.length > 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No links match your search</p>
-                </div>
-              ) : (
-                <EmptyState />
-              )}
-            </div>
+            {filteredLinks.length > 0 ? (
+              <div className={
+                viewMode === 'card' 
+                  ? "grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+                  : "space-y-2"
+              }>
+                {filteredLinks.map((link) => {
+                  const isSelected = selectedLinkIds.includes(link.id);
+                  
+                  return viewMode === 'card' ? (
+                    <LinkCard
+                      key={link.id}
+                      link={link}
+                      isSelected={isSelected}
+                      onSelect={(selected) => handleLinkSelection(link.id, selected)}
+                      onClick={() => handleLinkClick(link)}
+                      onUpdate={handleUpdateLink}
+                    />
+                  ) : (
+                    <LinkListItem
+                      key={link.id}
+                      link={link}
+                      isSelected={isSelected}
+                      onSelect={(selected) => handleLinkSelection(link.id, selected)}
+                      onClick={() => handleLinkClick(link)}
+                      onUpdate={handleUpdateLink}
+                    />
+                  );
+                })}
+              </div>
+            ) : links.length > 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">No links match your search</p>
+              </div>
+            ) : (
+              <EmptyState />
+            )}
 
             {/* Bulk Action Toolbar */}
             <BulkActionToolbar

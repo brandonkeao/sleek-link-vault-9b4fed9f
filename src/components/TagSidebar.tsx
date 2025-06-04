@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Settings, Database } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from './ui/button';
-import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -34,8 +33,6 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
   onSettingsClick
 }) => {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const handleTagClick = (tag: string, event: React.MouseEvent) => {
     // Check for Shift or Cmd/Ctrl key for multi-selection
@@ -52,14 +49,6 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
         onTagSelect(tag);
       }
     }
-  };
-
-  const handleDataSourcesClick = () => {
-    navigate('/data-sources');
-  };
-
-  const handleMyLinksClick = () => {
-    navigate('/');
   };
 
   return (
@@ -95,77 +84,46 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
       
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel className="text-gray-900 font-medium">Filter by Tags</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={handleMyLinksClick}
-                  className={`w-full justify-start text-gray-900 ${
-                    location.pathname === '/' ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
+                  onClick={() => onTagSelect(null)}
+                  className={`w-full justify-between text-gray-900 ${
+                    selectedTags.length === 0 ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
                   }`}
                 >
                   <span>All Links</span>
+                  <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                    {totalLinks}
+                  </span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={handleDataSourcesClick}
-                  className={`w-full justify-start text-gray-900 ${
-                    location.pathname === '/data-sources' ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <Database size={16} />
-                  <span>Data Sources</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {allTags.map((tag) => {
+                const isSelected = selectedTags.includes(tag);
+                return (
+                  <SidebarMenuItem key={tag}>
+                    <SidebarMenuButton
+                      onClick={(e) => handleTagClick(tag, e)}
+                      className={`w-full justify-between text-gray-900 ${
+                        isSelected ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="truncate">{tag}</span>
+                      <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                        {linkCounts[tag] || 0}
+                      </span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {location.pathname === '/' && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-gray-900 font-medium">Filter by Tags</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={() => onTagSelect(null)}
-                    className={`w-full justify-between text-gray-900 ${
-                      selectedTags.length === 0 ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    <span>All Links</span>
-                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
-                      {totalLinks}
-                    </span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                
-                {allTags.map((tag) => {
-                  const isSelected = selectedTags.includes(tag);
-                  return (
-                    <SidebarMenuItem key={tag}>
-                      <SidebarMenuButton
-                        onClick={(e) => handleTagClick(tag, e)}
-                        className={`w-full justify-between text-gray-900 ${
-                          isSelected ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
-                        }`}
-                      >
-                        <span className="truncate">{tag}</span>
-                        <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
-                          {linkCounts[tag] || 0}
-                        </span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
         
-        {selectedTags.length > 1 && location.pathname === '/' && (
+        {selectedTags.length > 1 && (
           <SidebarGroup>
             <SidebarGroupLabel className="text-gray-900 font-medium">Active Filters</SidebarGroupLabel>
             <SidebarGroupContent>
