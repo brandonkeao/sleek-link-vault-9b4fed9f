@@ -223,17 +223,12 @@ const Index = () => {
 
   if (showSettings) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="p-4">
-          <button
-            onClick={() => setShowSettings(false)}
-            className="mb-4 text-indigo-600 hover:text-indigo-700"
-          >
-            ← Back to Links
-          </button>
-        </div>
-        <SettingsPage />
-      </div>
+      <SettingsPage 
+        onBack={() => setShowSettings(false)}
+        allTags={allTags}
+        linkCounts={tagCounts}
+        totalLinks={links.length}
+      />
     );
   }
 
