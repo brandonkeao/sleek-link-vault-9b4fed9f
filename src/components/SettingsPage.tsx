@@ -535,7 +535,7 @@ const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }:
                         <div className="space-y-4">
                           <div>
                             <h4 className="font-medium mb-2 text-gray-900">Request</h4>
-                            <pre className="bg-gray-50 border border-gray-200 p-3 rounded text-sm overflow-auto">
+                            <pre className="bg-gray-50 border border-gray-200 p-3 rounded text-sm overflow-auto text-gray-900">
                               {JSON.stringify(selectedLog.requestData, null, 2)}
                             </pre>
                           </div>
@@ -549,7 +549,7 @@ const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }:
                                 {selectedLog.errorMessage}
                               </div>
                             ) : (
-                              <pre className="bg-gray-50 border border-gray-200 p-3 rounded text-sm overflow-auto">
+                              <pre className="bg-gray-50 border border-gray-200 p-3 rounded text-sm overflow-auto text-gray-900">
                                 {JSON.stringify(selectedLog.responseData, null, 2)}
                               </pre>
                             )}
