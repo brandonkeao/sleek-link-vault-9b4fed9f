@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Index from './Index';
 import * as useAuthModule from '../hooks/useAuth';
 import * as linkDatabase from '../utils/linkDatabase';
+import { User } from '@supabase/supabase-js';
 
 // Mock all the dependencies
 vi.mock('../hooks/useAuth');
@@ -48,13 +49,32 @@ describe('Index Page', () => {
   const mockUseAuth = vi.mocked(useAuthModule.useAuth);
   const mockLinkDatabase = vi.mocked(linkDatabase.linkDatabase);
 
+  // Create a proper mock User object with all required properties
+  const mockUser: User = {
+    id: 'user123',
+    email: 'test@example.com',
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: '2023-01-01T00:00:00Z',
+    phone: '',
+    confirmed_at: '2023-01-01T00:00:00Z',
+    email_confirmed_at: '2023-01-01T00:00:00Z',
+    last_sign_in_at: '2023-01-01T00:00:00Z',
+    role: 'authenticated',
+    updated_at: '2023-01-01T00:00:00Z'
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     
-    // Default auth state
+    // Default auth state with all required properties
     mockUseAuth.mockReturnValue({
-      user: { id: 'user123', email: 'test@example.com' },
+      user: mockUser,
+      session: null,
       loading: false,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
       signOut: vi.fn()
     });
 
@@ -68,7 +88,10 @@ describe('Index Page', () => {
   it('should show loading state when auth is loading', () => {
     mockUseAuth.mockReturnValue({
       user: null,
+      session: null,
       loading: true,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
       signOut: vi.fn()
     });
 
@@ -84,7 +107,10 @@ describe('Index Page', () => {
   it('should redirect to auth when user is not logged in', () => {
     mockUseAuth.mockReturnValue({
       user: null,
+      session: null,
       loading: false,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
       signOut: vi.fn()
     });
 
