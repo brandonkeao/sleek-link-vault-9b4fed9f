@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Index from './Index';
 import * as useAuthModule from '../hooks/useAuth';
-import * * linkDatabase from '../utils/linkDatabase';
+import * as linkDatabase from '../utils/linkDatabase';
 import { TestWrapper, createMockAuthContext, setupCommonMocks } from '../test-utils/mockHelpers';
 
 // Mock all the dependencies
