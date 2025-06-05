@@ -83,12 +83,12 @@ export const LinkCard: React.FC<LinkCardProps> = ({
 
   const handleShortUrlClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (link.shortUrl) {
-      // Ensure we're opening the full URL, not a relative path
       const fullUrl = link.shortUrl.startsWith('http') 
         ? link.shortUrl 
         : `https://${link.shortUrl}`;
-      window.open(fullUrl, '_blank');
+      window.open(fullUrl, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -134,13 +134,12 @@ export const LinkCard: React.FC<LinkCardProps> = ({
             {link.url}
           </a>
           {link.shortUrl && (
-            <a
-              href={link.shortUrl.startsWith('http') ? link.shortUrl : `https://${link.shortUrl}`}
+            <button
               onClick={handleShortUrlClick}
-              className="text-sm text-green-600 hover:text-green-700 truncate block transition-colors duration-200"
+              className="text-sm text-green-600 hover:text-green-700 truncate block transition-colors duration-200 text-left"
             >
               {link.shortUrl}
-            </a>
+            </button>
           )}
         </div>
       </div>
