@@ -4,7 +4,6 @@ import { User } from '@supabase/supabase-js';
 import { BrowserRouter } from 'react-router-dom';
 import React from 'react';
 
-// Create a proper mock User object with all required properties
 export const createMockUser = (overrides: Partial<User> = {}): User => ({
   id: 'user123',
   email: 'test@example.com',
@@ -21,7 +20,6 @@ export const createMockUser = (overrides: Partial<User> = {}): User => ({
   ...overrides
 });
 
-// Default auth context mock
 export const createMockAuthContext = (overrides = {}) => ({
   user: createMockUser(),
   session: null,
@@ -32,16 +30,13 @@ export const createMockAuthContext = (overrides = {}) => ({
   ...overrides
 });
 
-// Test wrapper component
 export const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
     {children}
   </BrowserRouter>
 );
 
-// Common mock setup for all tests
 export const setupCommonMocks = () => {
-  // Mock react-router-dom
   const mockNavigate = vi.fn();
   vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
@@ -51,7 +46,6 @@ export const setupCommonMocks = () => {
     };
   });
 
-  // Mock integrations
   vi.mock('../integrations/supabase/client', () => ({
     supabase: {
       channel: vi.fn(() => ({
@@ -63,7 +57,6 @@ export const setupCommonMocks = () => {
     }
   }));
 
-  // Mock toast hook
   vi.mock('../hooks/use-toast', () => ({
     useToast: () => ({
       toast: vi.fn()
