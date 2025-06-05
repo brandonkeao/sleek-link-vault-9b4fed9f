@@ -1,3 +1,4 @@
+
 # Welcome to your Lovable project
 
 ## Project info
@@ -49,6 +50,32 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## Running Tests
+
+This project uses Vitest for unit testing. Here are the available test commands:
+
+```sh
+# Run all tests once
+npm test
+
+# Run tests in watch mode (reruns tests when files change)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run tests with UI interface
+npm run test:ui
+```
+
+The test suite includes:
+- Component tests for UI components
+- Utility function tests
+- Integration tests for the main application pages
+- Type definition tests
+
+Test files are located alongside their corresponding source files with `.test.ts` or `.test.tsx` extensions.
 
 ## What technologies are used for this project?
 
