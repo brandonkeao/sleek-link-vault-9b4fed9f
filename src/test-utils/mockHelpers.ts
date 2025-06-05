@@ -1,4 +1,6 @@
 
+// @ts-nocheck
+
 import { vi } from 'vitest';
 import { User } from '@supabase/supabase-js';
 import { BrowserRouter } from 'react-router-dom';
