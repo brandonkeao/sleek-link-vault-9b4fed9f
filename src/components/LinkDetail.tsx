@@ -102,7 +102,8 @@ export const LinkDetail: React.FC<LinkDetailProps> = ({
   const handleShareLink = async () => {
     if (link.shortUrl) {
       try {
-        await navigator.clipboard.writeText(link.shortUrl);
+        const fullShortUrl = link.shortUrl.startsWith('http') ? link.shortUrl : `https://${link.shortUrl}`;
+        await navigator.clipboard.writeText(fullShortUrl);
         toast({
           title: "Link copied!",
           description: "Short link has been copied to clipboard",
@@ -115,6 +116,14 @@ export const LinkDetail: React.FC<LinkDetailProps> = ({
           variant: "destructive",
         });
       }
+    }
+  };
+
+  const handleShortUrlClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (link.shortUrl) {
+      const fullShortUrl = link.shortUrl.startsWith('http') ? link.shortUrl : `https://${link.shortUrl}`;
+      window.open(fullShortUrl, '_blank');
     }
   };
 
@@ -152,10 +161,9 @@ export const LinkDetail: React.FC<LinkDetailProps> = ({
               <div className="mt-2">
                 <p className="text-sm text-gray-600 mb-1">Short URL:</p>
                 <a
-                  href={link.shortUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-700 text-sm break-all transition-colors duration-200"
+                  href={link.shortUrl.startsWith('http') ? link.shortUrl : `https://${link.shortUrl}`}
+                  onClick={handleShortUrlClick}
+                  className="text-purple-600 hover:text-purple-700 text-sm break-all transition-colors duration-200 cursor-pointer"
                 >
                   {link.shortUrl}
                 </a>
