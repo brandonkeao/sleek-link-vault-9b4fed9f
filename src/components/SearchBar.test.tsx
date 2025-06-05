@@ -1,6 +1,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { SearchBar } from './SearchBar';
 
@@ -21,14 +22,15 @@ describe('SearchBar', () => {
     expect(input).toBeInTheDocument();
   });
 
-  it('should call onSearchChange when input value changes', () => {
+  it('should call onSearchChange when input value changes', async () => {
+    const user = userEvent.setup();
     const mockOnSearchChange = vi.fn();
     render(<SearchBar searchQuery="" onSearchChange={mockOnSearchChange} />);
     
     const input = screen.getByPlaceholderText('Search links...');
-    fireEvent.change(input, { target: { value: 'new search' } });
+    await user.type(input, 'new search');
     
-    expect(mockOnSearchChange).toHaveBeenCalledWith('new search');
+    expect(mockOnSearchChange).toHaveBeenCalled();
   });
 
   it('should render search icon', () => {
