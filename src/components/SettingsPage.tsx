@@ -28,9 +28,10 @@ interface SettingsPageProps {
   allTags?: string[];
   linkCounts?: Record<string, number>;
   totalLinks?: number;
+  onNavigateToFilteredLinks?: (tag: string | null) => void;
 }
 
-const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }: SettingsPageProps) => {
+const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0, onNavigateToFilteredLinks }: SettingsPageProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -252,6 +253,7 @@ const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }:
           linkCounts={linkCounts}
           totalLinks={totalLinks}
           onSettingsClick={() => {}}
+          onNavigateToLinks={onNavigateToFilteredLinks}
         />
         
         <SidebarInset>

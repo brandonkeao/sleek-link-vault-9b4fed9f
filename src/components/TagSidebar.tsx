@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -18,10 +17,11 @@ import {
 interface TagSidebarProps {
   allTags: string[];
   selectedTags: string[];
-  onTagSelect: (tag: string | null) => void;
+  onTagSelect: (tag: string | null, event?: React.MouseEvent) => void;
   linkCounts: Record<string, number>;
   totalLinks: number;
   onSettingsClick: () => void;
+  onNavigateToLinks?: (tag: string | null) => void;
 }
 
 export const TagSidebar: React.FC<TagSidebarProps> = ({
@@ -30,25 +30,41 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
   onTagSelect,
   linkCounts,
   totalLinks,
-  onSettingsClick
+  onSettingsClick,
+  onNavigateToLinks
 }) => {
   const { user, signOut } = useAuth();
 
   const handleTagClick = (tag: string, event: React.MouseEvent) => {
+    // If we're in settings mode and have a navigation callback, use it
+    if (onNavigateToLinks) {
+      onNavigateToLinks(tag);
+      return;
+    }
+
+    // Otherwise, use the normal tag selection logic
     // Check for Shift or Cmd/Ctrl key for multi-selection
     if (event.shiftKey || event.metaKey || event.ctrlKey) {
       // Multi-selection mode - toggle tag
-      onTagSelect(tag);
+      onTagSelect(tag, event);
     } else {
       // Single selection mode - replace current selection
       if (selectedTags.length === 1 && selectedTags[0] === tag) {
         // If clicking the only selected tag, clear selection
-        onTagSelect(null);
+        onTagSelect(null, event);
       } else {
         // Replace selection with this tag
-        onTagSelect(tag);
+        onTagSelect(tag, event);
       }
     }
+  };
+
+  const handleAllLinksClick = () => {
+    if (onNavigateToLinks) {
+      onNavigateToLinks(null);
+      return;
+    }
+    onTagSelect(null);
   };
 
   return (
@@ -89,7 +105,7 @@ export const TagSidebar: React.FC<TagSidebarProps> = ({
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={() => onTagSelect(null)}
+                  onClick={handleAllLinksClick}
                   className={`w-full justify-between text-gray-900 ${
                     selectedTags.length === 0 ? 'bg-purple-50 text-purple-700 font-medium' : 'hover:bg-gray-50'
                   }`}

@@ -224,6 +224,15 @@ const Index = () => {
     setSelectedLinkIds([]);
   };
 
+  const handleNavigateToFilteredLinks = (tag: string | null) => {
+    setShowSettings(false);
+    if (tag === null) {
+      setSelectedTags([]);
+    } else {
+      setSelectedTags([tag]);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -250,6 +259,7 @@ const Index = () => {
         allTags={allTags}
         linkCounts={tagCounts}
         totalLinks={links.length}
+        onNavigateToFilteredLinks={handleNavigateToFilteredLinks}
       />
     );
   }
