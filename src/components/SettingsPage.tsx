@@ -281,10 +281,25 @@ const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }:
             </div>
 
             <Tabs value={defaultTab} onValueChange={setDefaultTab} className="space-y-6">
-              <TabsList className="bg-gray-100">
-                <TabsTrigger value="api-config" className="data-[state=active]:bg-white">API Configuration</TabsTrigger>
-                <TabsTrigger value="slack" className="data-[state=active]:bg-white">Slack</TabsTrigger>
-                <TabsTrigger value="api-logs" className="data-[state=active]:bg-white">API Logs</TabsTrigger>
+              <TabsList className="bg-gray-800">
+                <TabsTrigger 
+                  value="api-config" 
+                  className="text-gray-300 data-[state=active]:bg-white data-[state=active]:text-gray-900 hover:text-white hover:bg-gray-700"
+                >
+                  API Configuration
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="slack" 
+                  className="text-gray-300 data-[state=active]:bg-white data-[state=active]:text-gray-900 hover:text-white hover:bg-gray-700"
+                >
+                  Slack
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="api-logs" 
+                  className="text-gray-300 data-[state=active]:bg-white data-[state=active]:text-gray-900 hover:text-white hover:bg-gray-700"
+                >
+                  API Logs
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="api-config">
