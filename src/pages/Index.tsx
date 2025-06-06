@@ -346,7 +346,7 @@ const Index = () => {
                 <p className="text-gray-500 text-lg">No links match your search</p>
               </div>
             ) : (
-              <EmptyState />
+              <EmptyState onSettingsClick={() => setShowSettings(true)} />
             )}
 
             {/* Bulk Action Toolbar */}
