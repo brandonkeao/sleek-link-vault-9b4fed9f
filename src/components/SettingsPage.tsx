@@ -306,7 +306,7 @@ const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }:
                             value={apiKey}
                             onChange={(e) => setApiKey(e.target.value)}
                             placeholder="Enter your Rebrandly API key"
-                            className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                            className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
                           />
                           <Button
                             type="button"
@@ -336,7 +336,7 @@ const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }:
                         value={customDomain}
                         onChange={(e) => setCustomDomain(e.target.value)}
                         placeholder="yourdomain.com"
-                        className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                        className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
                       />
                     </div>
 
@@ -402,7 +402,7 @@ const SettingsPage = ({ onBack, allTags = [], linkCounts = {}, totalLinks = 0 }:
                         <div className="space-y-2">
                           <Label className="text-gray-700">Send notifications to:</Label>
                           <Select value={slackChannel} onValueChange={handleSlackChannelChange}>
-                            <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                            <SelectTrigger className="bg-white border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-purple-500">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
